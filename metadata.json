@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Wayuuglish",
+  "description": "Plataforma de aprendizaje offline-first estilo Duolingo para Wayuunaiki, Inglés y Español con seguimiento y colaboración docente.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
