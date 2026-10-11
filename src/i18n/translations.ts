@@ -38,6 +38,11 @@ export interface UIStrings {
   recommendedCourses: string;
   allCourses: string;
   activeCourseBadge: string;
+  accountSectionTitle: string;
+  loginWithGoogle: string;
+  logoutBtn: string;
+  cloudSyncActive: string;
+  guestModeDesc: string;
 }
 
 export const translations: Record<UILanguage, UIStrings> = {
@@ -78,6 +83,11 @@ export const translations: Record<UILanguage, UIStrings> = {
     recommendedCourses: 'Ekirajia anasü pümüin',
     allCourses: 'Süpüshua\'a ekirajia',
     activeCourseBadge: 'A\'yataasü ✓',
+    accountSectionTitle: 'Pünülia sümaa Sincronización',
+    loginWithGoogle: 'Ounawaa sümaa Google',
+    logoutBtn: 'Aju\'ittaa',
+    cloudSyncActive: 'A\'yataasü sirumatuirua (Nube)',
+    guestModeDesc: 'Pütula\'aya püyatain süpüla nnojoitpünaa motuin paa\'in sünain jeerüin.',
   },
   es: {
     languageName: 'Español',
@@ -116,6 +126,11 @@ export const translations: Record<UILanguage, UIStrings> = {
     recommendedCourses: 'Cursos recomendados para ti',
     allCourses: 'Todos los cursos disponibles',
     activeCourseBadge: 'Ruta activa ✓',
+    accountSectionTitle: 'Cuenta y Sincronización',
+    loginWithGoogle: 'Continuar con Google',
+    logoutBtn: 'Cerrar sesión',
+    cloudSyncActive: 'Sincronizado en la nube',
+    guestModeDesc: 'Inicia sesión con Google para respaldar tu racha, XP y progreso entre dispositivos.',
   },
   en: {
     languageName: 'English',
@@ -154,5 +169,10 @@ export const translations: Record<UILanguage, UIStrings> = {
     recommendedCourses: 'Recommended courses for you',
     allCourses: 'All available courses',
     activeCourseBadge: 'Active track ✓',
+    accountSectionTitle: 'Account & Synchronization',
+    loginWithGoogle: 'Sign in with Google',
+    logoutBtn: 'Sign out',
+    cloudSyncActive: 'Synced to cloud',
+    guestModeDesc: 'Sign in with Google to backup your streak, XP, and lesson progress across devices.',
   },
 };

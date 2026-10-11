@@ -12,5 +12,15 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Wayuuglish",
+        "supportEmail": "danielyepezgarces@gmail.com"
+      }
+    }
   }
 }

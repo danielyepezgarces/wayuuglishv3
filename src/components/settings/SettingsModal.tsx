@@ -6,9 +6,11 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { Course } from '../../types';
 import { UILanguage, UIStrings, translations } from '../../i18n/translations';
+import { User } from '../../services/firebase';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -19,6 +21,10 @@ interface SettingsModalProps {
   onSelectCourse: (courseId: string) => void;
   courses: Course[];
   t: UIStrings;
+  user: User | null;
+  onGoogleSignIn: () => Promise<void>;
+  onSignOut: () => Promise<void>;
+  isAuthLoading: boolean;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -30,6 +36,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSelectCourse,
   courses,
   t,
+  user,
+  onGoogleSignIn,
+  onSignOut,
+  isAuthLoading,
 }) => {
   const [activeTab, setActiveTab] = useState<'recommended' | 'all'>('recommended');
 
@@ -94,6 +104,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </View>
 
           <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
+            {/* Section 0: User Account & Google OAuth */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>👤 {t.accountSectionTitle}</Text>
+              {user ? (
+                <View style={styles.userProfileCard}>
+                  <View style={styles.userAvatarWrap}>
+                    {user.photoURL ? (
+                      <Image source={{ uri: user.photoURL }} style={styles.userAvatarImg} />
+                    ) : (
+                      <Text style={styles.userAvatarEmoji}>👤</Text>
+                    )}
+                  </View>
+                  <View style={styles.userInfoCol}>
+                    <Text style={styles.userNameText}>{user.displayName || 'Estudiante Wayuu'}</Text>
+                    <Text style={styles.userEmailText}>{user.email}</Text>
+                    <View style={styles.syncBadge}>
+                      <Text style={styles.syncBadgeDot}>●</Text>
+                      <Text style={styles.syncBadgeText}>{t.cloudSyncActive}</Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.signOutBtn}
+                    onPress={onSignOut}
+                    disabled={isAuthLoading}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.signOutBtnText}>{t.logoutBtn}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.guestCard}>
+                  <Text style={styles.sectionSubtitle}>{t.guestModeDesc}</Text>
+                  <TouchableOpacity
+                    style={styles.googleSignInBtn}
+                    onPress={onGoogleSignIn}
+                    disabled={isAuthLoading}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.googleIconBadge}>
+                      <Text style={styles.googleIconText}>G</Text>
+                    </View>
+                    <Text style={styles.googleSignInBtnText}>
+                      {isAuthLoading ? 'Conectando...' : t.loginWithGoogle}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
             {/* Section 1: Interface Language Selector */}
             <View style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>{t.interfaceLangTitle}</Text>
@@ -316,6 +375,114 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 3,
     lineHeight: 16,
+  },
+  userProfileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    padding: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    gap: 12,
+  },
+  userAvatarWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#E2E8F0',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userAvatarImg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  userAvatarEmoji: {
+    fontSize: 22,
+  },
+  userInfoCol: {
+    flex: 1,
+  },
+  userNameText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  userEmailText: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 1,
+  },
+  syncBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 3,
+  },
+  syncBadgeDot: {
+    color: '#10B981',
+    fontSize: 10,
+  },
+  syncBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#10B981',
+  },
+  signOutBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+  },
+  signOutBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  guestCard: {
+    marginTop: 10,
+    gap: 12,
+  },
+  googleSignInBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  googleIconBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#EA4335',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleIconText: {
+    color: '#FFF',
+    fontWeight: '900',
+    fontSize: 13,
+  },
+  googleSignInBtnText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F172A',
   },
   langGrid: {
     marginTop: 14,

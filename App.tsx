@@ -21,6 +21,8 @@ import { progressService, UserStats } from './src/services/progressService';
 import { ExerciseRunner } from './src/components/exercise/ExerciseRunner';
 import { DayStreakModal } from './src/components/streak/DayStreakModal';
 import { SettingsModal } from './src/components/settings/SettingsModal';
+import { authService } from './src/services/authService';
+import { User } from './src/services/firebase';
 
 export default function App() {
   const { width: windowWidth } = useWindowDimensions();
@@ -28,6 +30,10 @@ export default function App() {
 
   const [lang, setLang] = useState<UILanguage>(progressService.getStats().interfaceLanguage || 'guc');
   const [stats, setStats] = useState<UserStats>(progressService.getStats());
+
+  // Auth state
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   // Modals state
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -55,6 +61,29 @@ export default function App() {
     });
     return unsubscribe;
   }, [lang]);
+
+  // Subscribe to Firebase Authentication state
+  useEffect(() => {
+    const unsubscribeAuth = authService.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return unsubscribeAuth;
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    setIsAuthLoading(true);
+    const result = await authService.signInWithGoogle();
+    setIsAuthLoading(false);
+    if (!result.success && result.error) {
+      Alert.alert('Google Sign-In', result.error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    setIsAuthLoading(true);
+    await authService.signOut();
+    setIsAuthLoading(false);
+  };
 
   const handleStartLesson = (lesson: Lesson) => {
     if (stats.hearts <= 0) {
@@ -227,6 +256,29 @@ export default function App() {
                   <Text style={styles.langSelectorArrow}>▾</Text>
                 </TouchableOpacity>
 
+                {/* User Profile or Google Sign-In */}
+                {user ? (
+                  <TouchableOpacity
+                    style={styles.desktopUserPill}
+                    onPress={() => setShowSettingsModal(true)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.desktopUserEmoji}>👤</Text>
+                    <Text style={styles.desktopUserName} numberOfLines={1}>
+                      {user.displayName?.split(' ')[0] || 'Mi Perfil'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.desktopLoginBtn}
+                    onPress={handleGoogleSignIn}
+                    disabled={isAuthLoading}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.desktopLoginBtnText}>G Entrar</Text>
+                  </TouchableOpacity>
+                )}
+
                 {/* Settings Gear Button */}
                 <TouchableOpacity
                   style={styles.settingsIconBtn}
@@ -256,6 +308,16 @@ export default function App() {
                     <Text style={styles.langSelectorFlag}>{t.flag}</Text>
                     <Text style={styles.langSelectorName}>{t.languageName}</Text>
                     <Text style={styles.langSelectorArrow}>▾</Text>
+                  </TouchableOpacity>
+
+                  {/* User Profile / Quick Login */}
+                  <TouchableOpacity
+                    style={[styles.userIconBtn, user && styles.userIconBtnActive]}
+                    onPress={() => (user ? setShowSettingsModal(true) : handleGoogleSignIn())}
+                    disabled={isAuthLoading}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.userIconText}>{user ? '👤' : 'G'}</Text>
                   </TouchableOpacity>
 
                   {/* Quick Settings Gear Button */}
@@ -401,7 +463,7 @@ export default function App() {
         </View>
       </ScrollView>
 
-      {/* Settings Modal (Interface Language & Course Tracks) */}
+      {/* Settings Modal (Interface Language, Course Tracks, Google OAuth) */}
       <SettingsModal
         visible={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
@@ -416,6 +478,10 @@ export default function App() {
         }}
         courses={initialCourses}
         t={t}
+        user={user}
+        onGoogleSignIn={handleGoogleSignIn}
+        onSignOut={handleSignOut}
+        isAuthLoading={isAuthLoading}
       />
 
       {/* Hearts (Vidas) Interactive Modal */}
@@ -587,6 +653,61 @@ const styles = StyleSheet.create({
     height: 24,
     backgroundColor: '#E2E8F0',
     marginHorizontal: 2,
+  },
+  desktopUserPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#EFF6FF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    maxWidth: 120,
+  },
+  desktopUserEmoji: {
+    fontSize: 14,
+  },
+  desktopUserName: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1E40AF',
+  },
+  desktopLoginBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    backgroundColor: '#FFF',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+  },
+  desktopLoginBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  userIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userIconBtnActive: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#93C5FD',
+  },
+  userIconText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0F172A',
   },
   desktopScrollContent: {
     maxWidth: 720,
