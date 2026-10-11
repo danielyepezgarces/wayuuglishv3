@@ -262,70 +262,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Language Tracks Selection Showcase */}
-      <section className="py-16 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mb-3">
-            <i className="fa-solid fa-shapes text-amber-600"></i>
-            <span>Rutas Multilingües</span>
-          </div>
-          <h2 className="font-display font-black text-3xl sm:text-4xl text-slate-900 tracking-tight">
-            Elige la ruta que deseas explorar
-          </h2>
-          <p className="text-sm text-slate-600 mt-2">
-            Puedes cambiar de par lingüístico en cualquier momento desde tu menú principal.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TRACK_CARDS.map((track) => {
-            const isSelected = currentTrack === track.id;
-            return (
-              <div
-                key={track.id}
-                onClick={() => {
-                  sounds.playPop();
-                  onSelectTrack(track.id);
-                }}
-                className={`relative rounded-3xl p-6 border-2 transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-rose-50/50 border-rose-600 shadow-lg shadow-rose-100'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-rose-600">
-                      <i className={`${track.icon} text-base`}></i>
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                      {track.tag}
-                    </span>
-                  </div>
-
-                  <h3 className="font-display font-extrabold text-base text-slate-900 mb-1">
-                    {track.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {track.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700">
-                    {isSelected ? 'Ruta activa' : 'Seleccionar'}
-                  </span>
-                  <i
-                    className={`fa-solid ${
-                      isSelected ? 'fa-circle-check text-rose-600 text-base' : 'fa-arrow-right text-xs text-slate-400'
-                    }`}
-                  ></i>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       {/* Features & Methodology Grid */}
       <section className="py-16 sm:py-20 bg-white border-y border-slate-200">
