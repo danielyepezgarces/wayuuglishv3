@@ -19,7 +19,10 @@
       "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "Wayuuglish",
-        "supportEmail": "danielyepezgarces@gmail.com"
+        "supportEmail": "danielyepezgarces@gmail.com",
+        "authorizedRedirectUris": [
+          "https://learn.dyepezg.dev"
+        ]
       }
     }
   }
