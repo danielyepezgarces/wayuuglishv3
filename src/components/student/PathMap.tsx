@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Course, Lesson, User, Module } from '../../types';
 import { MascotWaraush } from '../MascotWaraush';
 import { sounds } from '../../services/soundEffects';
+import { notifications } from '../../services/notificationService';
 import {
   Check,
   Star,
@@ -12,23 +13,35 @@ import {
   Sparkles,
   ChevronRight,
   Flame,
-  Info
+  Info,
+  BellRing,
+  X
 } from 'lucide-react';
+
+import { WeeklyActivity } from './WeeklyActivity';
 
 interface PathMapProps {
   course: Course;
   user: User;
   onStartLesson: (lesson: Lesson, moduleTitle: string) => void;
   onOpenJoinModal: () => void;
+  onOpenProfileModal?: () => void;
 }
 
 export const PathMap: React.FC<PathMapProps> = ({
   course,
   user,
   onStartLesson,
-  onOpenJoinModal
+  onOpenJoinModal,
+  onOpenProfileModal
 }) => {
   const [selectedLesson, setSelectedLesson] = useState<{ lesson: Lesson; module: Module } | null>(null);
+  const [pushEnabled, setPushEnabled] = useState(notifications.isEnabledByUser());
+  const [showPushBanner, setShowPushBanner] = useState(!notifications.isEnabledByUser());
+
+  useEffect(() => {
+    setPushEnabled(notifications.isEnabledByUser());
+  }, []);
 
   // Determine which lessons are completed, active, and locked
   const isLessonCompleted = (lessonId: string) => user.completedLessons.includes(lessonId);
@@ -42,6 +55,17 @@ export const PathMap: React.FC<PathMapProps> = ({
     setSelectedLesson({ lesson, module });
   };
 
+  const handleEnablePushFromBanner = async () => {
+    sounds.playPop();
+    const granted = await notifications.requestPermission();
+    if (granted) {
+      setPushEnabled(true);
+      setShowPushBanner(false);
+      notifications.scheduleNextReminder(user);
+      notifications.sendStreakReminder(user);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8">
       {/* Top Banner: Cultural & Learning Track Overview */}
@@ -52,8 +76,13 @@ export const PathMap: React.FC<PathMapProps> = ({
         <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="max-w-xl text-center sm:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold mb-3">
-              <span>{course.sourceFlag} ➔ {course.targetFlag}</span>
-              <span>{course.title}</span>
+              <span className="flex items-center gap-1.5 font-mono text-[11px] font-bold bg-white/25 px-2 py-0.5 rounded-md">
+                <i className="fa-solid fa-earth-americas text-amber-200 text-[10px]"></i>
+                <span>{course.sourceLang}</span>
+                <i className="fa-solid fa-arrow-right text-[8px] text-white/80"></i>
+                <span>{course.targetLang}</span>
+              </span>
+              <span>· {course.title}</span>
             </div>
             <h1 className="font-display font-extrabold text-2xl sm:text-3xl tracking-tight mb-2">
               Aprende con Waraush en La Guajira
@@ -85,6 +114,48 @@ export const PathMap: React.FC<PathMapProps> = ({
             />
           </div>
         </div>
+      </div>
+
+      {/* Push Notification Streak Reminder banner if not enabled yet */}
+      {!pushEnabled && showPushBanner && (
+        <div className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <BellRing className="w-5 h-5 text-amber-600 animate-bounce" />
+            </div>
+            <div>
+              <div className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
+                <span>¿Quieres que Waraush proteja tu racha de {user.streak} días?</span>
+                <Flame className="w-4 h-4 fill-amber-500 text-amber-600 inline" />
+              </div>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Activa avisos Push del navegador para recibir recordatorios diarios antes de que termine el día, incluso offline o con la app cerrada.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+            <button
+              onClick={() => setShowPushBanner(false)}
+              className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 font-semibold rounded-xl"
+            >
+              Ahora no
+            </button>
+            <button
+              onClick={handleEnablePushFromBanner}
+              className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+            >
+              Activar Avisos
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 7-Day Weekly Activity Visualizer (Recharts BarChart) */}
+      <div className="mb-10 animate-fade-in">
+        <WeeklyActivity
+          user={user}
+          onOpenGoalSettings={onOpenProfileModal}
+        />
       </div>
 
       {/* Modules and Lesson Path */}
@@ -124,63 +195,54 @@ export const PathMap: React.FC<PathMapProps> = ({
                   foundActive = true;
                 }
 
-                // If previous lesson was completed or this is the very first lesson of module 1
-                const isUnlocked = completed || isCurrent || (modIdx === 0 && lsnIdx === 0);
+                const isUnlocked = completed || isCurrent;
 
-                // Alternating horizontal offset for natural winding road feel
-                const offsets = ['translate-x-0', '-translate-x-12 sm:-translate-x-20', 'translate-x-12 sm:translate-x-20', 'translate-x-0'];
-                const offsetClass = offsets[lsnIdx % offsets.length];
+                // Subtle wavy displacement pattern (Duolingo snake curve)
+                const offsetPattern = [0, 42, 65, 30, -30, -65, -42];
+                const horizontalOffset = offsetPattern[(modIdx * 3 + lsnIdx) % offsetPattern.length];
 
                 return (
-                  <div key={lesson.id} className="relative flex flex-col items-center my-4">
-                    {/* Winding road path node */}
-                    <div className={`transition-transform duration-200 ${offsetClass}`}>
-                      <button
-                        onClick={() => handleNodeClick(lesson, module, isUnlocked)}
-                        disabled={!isUnlocked}
-                        className={`btn-duo relative group w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-                          completed
-                            ? 'bg-emerald-500 text-white shadow-[0_6px_0_#047857] hover:bg-emerald-400'
-                            : isCurrent
-                            ? 'bg-rose-500 text-white shadow-[0_6px_0_#BE123C] hover:bg-rose-400 animate-bounce'
-                            : isUnlocked
-                            ? 'bg-rose-600 text-white shadow-[0_6px_0_#9F1239]'
-                            : 'bg-slate-200 text-slate-400 shadow-[0_6px_0_#94A3B8] cursor-not-allowed'
-                        }`}
-                      >
-                        {/* Node icon */}
-                        {completed ? (
-                          <Check className="w-9 h-9 stroke-[3]" />
-                        ) : isCurrent ? (
-                          <Play className="w-8 h-8 fill-white ml-1" />
-                        ) : isUnlocked ? (
-                          <Star className="w-8 h-8 fill-white" />
-                        ) : (
-                          <Lock className="w-7 h-7" />
-                        )}
+                  <div
+                    key={lesson.id}
+                    className="relative my-4 flex flex-col items-center"
+                    style={{ transform: `translateX(${horizontalOffset}px)` }}
+                  >
+                    {/* Node Trigger Button */}
+                    <button
+                      onClick={() => handleNodeClick(lesson, module, isUnlocked)}
+                      disabled={!isUnlocked}
+                      className={`relative w-18 h-18 rounded-full flex items-center justify-center transition-all select-none ${
+                        completed
+                          ? 'bg-amber-400 hover:bg-amber-300 text-amber-950 btn-tactile shadow-amber-600/30 ring-4 ring-amber-100'
+                          : isCurrent
+                          ? 'bg-rose-600 hover:bg-rose-500 text-white btn-tactile shadow-rose-700/30 ring-8 ring-rose-100 animate-pulse'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed border-b-4 border-slate-300'
+                      }`}
+                    >
+                      {completed ? (
+                        <Check className="w-8 h-8 stroke-[3]" />
+                      ) : isCurrent ? (
+                        <Play className="w-8 h-8 fill-current ml-1" />
+                      ) : (
+                        <Lock className="w-6 h-6" />
+                      )}
 
-                        {/* Crown/Star badge on top if completed */}
-                        {completed && (
-                          <div className="absolute -top-2 -right-1 w-7 h-7 bg-amber-400 rounded-full flex items-center justify-center shadow-xs border-2 border-white text-amber-900">
-                            <Star className="w-3.5 h-3.5 fill-amber-900" />
-                          </div>
-                        )}
+                      {/* Crown/Star Badge for completion */}
+                      {completed && (
+                        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center text-white text-[10px] shadow-xs">
+                          ★
+                        </span>
+                      )}
+                    </button>
 
-                        {/* XP tag floating on hover */}
-                        <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[11px] font-semibold py-1 px-2.5 rounded-lg whitespace-nowrap pointer-events-none z-20">
-                          {lesson.title} (+{lesson.xpReward} XP)
-                        </div>
-                      </button>
-
-                      {/* Lesson title label */}
-                      <div className="mt-4 text-center max-w-[140px] mx-auto">
-                        <div className="text-xs font-bold text-slate-800 line-clamp-1">
-                          {lesson.title}
-                        </div>
-                        <div className="text-[10px] text-slate-500">
-                          {completed ? 'Completada' : isUnlocked ? 'Disponible' : 'Bloqueada'}
-                        </div>
-                      </div>
+                    {/* Lesson Label */}
+                    <div className="mt-2 text-center max-w-[120px]">
+                      <span className="text-xs font-bold text-slate-800 line-clamp-1 block">
+                        {lesson.title}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        +{lesson.xpReward} XP
+                      </span>
                     </div>
                   </div>
                 );
@@ -190,52 +252,52 @@ export const PathMap: React.FC<PathMapProps> = ({
         ))}
       </div>
 
-      {/* Lesson Preview Modal */}
+      {/* Lesson Details Dialog / Popover before starting */}
       {selectedLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 text-center animate-fade-in">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
               <BookOpen className="w-8 h-8" />
             </div>
 
-            <div className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-rose-600">
               {selectedLesson.module.title}
-            </div>
-            <h3 className="font-display font-bold text-xl text-slate-900 mb-2">
+            </span>
+            <h3 className="font-display font-extrabold text-xl text-slate-900 mt-1 mb-2">
               {selectedLesson.lesson.title}
             </h3>
-            <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-              {selectedLesson.lesson.description}
+            <p className="text-xs text-slate-500 leading-relaxed mb-6">
+              Aprende vocabulario clave con audio nativo y ejercicios interactivos.
             </p>
 
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 mb-6 flex items-center justify-around text-xs">
-              <div className="flex items-center gap-1.5 font-bold text-sky-600">
-                <Sparkles className="w-4 h-4" />
-                <span>+{selectedLesson.lesson.xpReward} XP</span>
+            <div className="p-3 bg-slate-50 rounded-xl mb-6 text-xs text-slate-600 flex justify-around">
+              <div>
+                <span className="block font-bold text-slate-900 text-sm">{selectedLesson.lesson.exercises.length}</span>
+                <span className="text-[10px] text-slate-400">Ejercicios</span>
               </div>
-              <div className="w-px h-6 bg-slate-200" />
-              <div className="flex items-center gap-1.5 font-bold text-amber-600">
-                <Flame className="w-4 h-4 fill-amber-500" />
-                <span>Racha activa</span>
+              <div className="border-r border-slate-200" />
+              <div>
+                <span className="block font-bold text-amber-600 text-sm">+{selectedLesson.lesson.xpReward} XP</span>
+                <span className="text-[10px] text-slate-400">Recompensa</span>
               </div>
             </div>
 
             <div className="space-y-2">
               <button
                 onClick={() => {
-                  const target = selectedLesson;
+                  const s = selectedLesson;
                   setSelectedLesson(null);
-                  onStartLesson(target.lesson, target.module.title);
+                  onStartLesson(s.lesson, s.module.title);
                 }}
-                className="btn-duo w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-2xl shadow-[0_4px_0_#BE123C] transition"
+                className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl btn-tactile shadow-xs transition"
               >
-                ¡Empezar Lección!
+                Comenzar Lección
               </button>
               <button
                 onClick={() => setSelectedLesson(null)}
                 className="w-full py-2.5 px-4 text-slate-500 hover:text-slate-800 text-xs font-semibold rounded-xl transition"
               >
-                Cerrar
+                Volver
               </button>
             </div>
           </div>

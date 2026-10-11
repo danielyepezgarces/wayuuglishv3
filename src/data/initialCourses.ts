@@ -8,8 +8,8 @@ export const initialCourses: Course[] = [
     title: 'Wayuunaiki → English',
     sourceLang: 'Wayuunaiki',
     targetLang: 'English',
-    sourceFlag: '🇨🇴🌵',
-    targetFlag: '🇬🇧🇺🇸',
+    sourceFlag: 'WAY',
+    targetFlag: 'EN',
     authorName: 'Profe Rosa Epieyuu & Profe David Ipuana',
     collaborators: ['profe.rosa@wayuuglish.edu', 'profe.david@wayuuglish.edu'],
     modules: [
@@ -166,8 +166,8 @@ export const initialCourses: Course[] = [
     title: 'Español → English',
     sourceLang: 'Español',
     targetLang: 'English',
-    sourceFlag: '🇨🇴🇪🇸',
-    targetFlag: '🇬🇧🇺🇸',
+    sourceFlag: 'ES',
+    targetFlag: 'EN',
     authorName: 'Profe Carlos Redondo & Lic. Mariángel Pushaina',
     collaborators: ['carlos.redondo@wayuuglish.edu'],
     modules: [
@@ -259,8 +259,8 @@ export const initialCourses: Course[] = [
     title: 'English → Wayuunaiki',
     sourceLang: 'English',
     targetLang: 'Wayuunaiki',
-    sourceFlag: '🇬🇧🇺🇸',
-    targetFlag: '🌵🏜️',
+    sourceFlag: 'EN',
+    targetFlag: 'WAY',
     authorName: 'Profe David Ipuana',
     collaborators: ['profe.david@wayuuglish.edu'],
     modules: [
@@ -325,8 +325,8 @@ export const initialCourses: Course[] = [
     title: 'Wayuunaiki → Español',
     sourceLang: 'Wayuunaiki',
     targetLang: 'Español',
-    sourceFlag: '🌵🏜️',
-    targetFlag: '🇨🇴🇪🇸',
+    sourceFlag: 'WAY',
+    targetFlag: 'ES',
     authorName: 'Colectivo Etnoeducativo Wayuu',
     collaborators: ['etno.guajira@wayuuglish.edu', 'profe.rosa@wayuuglish.edu'],
     modules: [

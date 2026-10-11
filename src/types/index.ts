@@ -72,21 +72,77 @@ export interface StudentProgress {
   synced: boolean;
 }
 
+export type DailyGoalIntensity = 'casual' | 'regular' | 'serious' | 'insane';
+
+export type KanasuPattern =
+  | 'kanasu-molokonoutaya'
+  | 'kanasu-pasuatalooshi'
+  | 'kanasu-pulikeruya'
+  | 'kanasu-triangles'
+  | 'stripes'
+  | 'plain';
+
+export type CardinalAccessory =
+  | 'mochila'
+  | 'sombrero-wayuu'
+  | 'tumuma-necklace'
+  | 'feather-crest'
+  | 'none';
+
+export type CardinalExpression = 'cheerful' | 'focused' | 'proud' | 'curious';
+
+export interface CardinalAvatarConfig {
+  id: string;
+  name: string;
+  description?: string;
+  bodyColor: string;
+  crestColor: string;
+  beakColor: string;
+  chestPattern: KanasuPattern;
+  patternColorPrimary: string;
+  patternColorSecondary: string;
+  accessory: CardinalAccessory;
+  eyeExpression: CardinalExpression;
+  borderPalette: string;
+  isCustomGenerated?: boolean;
+  customDataUrl?: string;
+  seed?: string;
+}
+
+export interface DailyActivityRecord {
+  date: string; // YYYY-MM-DD
+  dayLabel: string; // e.g. "Lun 5", "Mar 6"
+  dayName: string; // "Lunes", "Martes", etc.
+  lessonsCompleted: number;
+  xpEarned: number;
+  dailyGoalXp: number;
+  goalReached: boolean;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  avatar?: CardinalAvatarConfig | string;
   classroomCode?: string;
   currentTrack: LanguagePair;
   streak: number;
   lastActiveDate: string;
+  dailyGoal: number;
+  dailyGoalTier: DailyGoalIntensity;
+  dailyGoalXp: number;
+  xpEarnedToday: number;
+  lessonsCompletedToday: number;
+  completedDates?: string[];
+  weeklyHistory?: DailyActivityRecord[];
   hearts: number;
   maxHearts: number;
   xp: number;
   gems: number;
   completedLessons: string[];
   joinedAt: string;
+  isAnonymous?: boolean;
 }
 
 export interface SyncMutation {

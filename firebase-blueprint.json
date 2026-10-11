@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile, learning gamification and role settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Firebase Auth user ID" },
+        "name": { "type": "string", "description": "Display name of the learner or educator" },
+        "email": { "type": "string", "description": "User email address" },
+        "role": { "type": "string", "enum": ["student", "teacher"], "description": "Role in the application" },
+        "classroomCode": { "type": "string", "description": "Assigned classroom code" },
+        "currentTrack": { "type": "string", "description": "Active learning language pair" },
+        "streak": { "type": "number", "description": "Current learning day streak" },
+        "dailyGoalTier": { "type": "string", "enum": ["casual", "regular", "serious", "insane"], "description": "Selected daily intensity" },
+        "dailyGoalXp": { "type": "number", "description": "Daily XP target" },
+        "xpEarnedToday": { "type": "number", "description": "XP earned today" },
+        "xp": { "type": "number", "description": "Cumulative XP" },
+        "gems": { "type": "number", "description": "Earned gems count" },
+        "hearts": { "type": "number", "description": "Current hearts" },
+        "maxHearts": { "type": "number", "description": "Max hearts limit" }
+      },
+      "required": ["id", "name", "email", "role"]
+    },
+    "Classroom": {
+      "title": "Classroom",
+      "description": "Classroom created by teachers for student tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Classroom unique identifier" },
+        "code": { "type": "string", "description": "Unique joining code" },
+        "name": { "type": "string", "description": "Human-readable classroom name" },
+        "courseId": { "type": "string", "description": "Course identifier" },
+        "teacherId": { "type": "string", "description": "Author teacher UID" },
+        "teacherName": { "type": "string", "description": "Teacher display name" }
+      },
+      "required": ["id", "code", "name", "teacherId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User account and progress documents"
+    },
+    "/classrooms/{classroomId}": {
+      "schema": "Classroom",
+      "description": "Classrooms created by educators"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Wayuuglish | Aprende Wayuunaiki, Inglés y Español",
+  "short_name": "Wayuuglish",
+  "description": "Plataforma de aprendizaje offline-first estilo Duolingo para Wayuunaiki, Inglés y Español con seguimiento docente.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF8",
+  "theme_color": "#E11D48",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Ccircle cx='96' cy='96' r='90' fill='%23E11D48'/%3E%3Cpolygon points='96,30 118,70 74,70' fill='%23BE123C'/%3E%3Ccircle cx='96' cy='110' r='55' fill='%23EF4444'/%3E%3Cpolygon points='120,110 165,118 120,132' fill='%23F59E0B'/%3E%3Ccircle cx='86' cy='95' r='10' fill='%23FFFFFF'/%3E%3Ccircle cx='89' cy='95' r='5' fill='%231E293B'/%3E%3Crect x='50' y='130' width='92' height='16' rx='8' fill='%2310B981'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='%23E11D48'/%3E%3Cpolygon points='256,80 315,185 197,185' fill='%23BE123C'/%3E%3Ccircle cx='256' cy='290' r='145' fill='%23EF4444'/%3E%3Cpolygon points='320,290 440,310 320,350' fill='%23F59E0B'/%3E%3Ccircle cx='230' cy='250' r='26' fill='%23FFFFFF'/%3E%3Ccircle cx='238' cy='250' r='13' fill='%231E293B'/%3E%3Crect x='130' y='350' width='250' height='40' rx='20' fill='%2310B981'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
